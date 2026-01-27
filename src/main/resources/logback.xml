@@ -1,0 +1,28 @@
+<configuration>
+
+    <appender name="REST_SERVICE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>./logs/control-horario-api.log</file>
+        <encoder>
+            <pattern>%date{"yyyy-MM-dd' 'HH:mm:ss,SSS", America/Santiago} %level [%thread] %logger{10} [%file:%line] %msg%n</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>./logs/acontrol-horario-api.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>10</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%date{"yyyy-MM-dd' 'HH:mm:ss,SSS", America/Santiago} %level [%thread] %logger{10} [%file:%line] %msg%n</pattern>
+        </encoder>
+    </appender>
+
+
+    <logger name="com.indra.controlhorarioapi" level="INFO">
+        <appender-ref ref="REST_SERVICE"/>
+    </logger>
+
+    <root level="error">
+        <appender-ref ref="STDOUT"/>
+    </root>
+</configuration>

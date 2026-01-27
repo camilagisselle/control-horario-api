@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: control-horario-api
+  cambiame: db
+  sql:
+    init:
+      mode: always
+      continue-on-error: true
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      dialect: org.hibernate.dialect.MySQLDialect
+    defer-datasource-initialization: true
