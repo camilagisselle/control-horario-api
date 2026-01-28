@@ -24,7 +24,7 @@ public class Usuario {
     private String password;
 
     @Column
-    private String estado;
+    private Integer estado;
 
     @OneToMany(mappedBy="usuario")
     private List<Historial> historial;
