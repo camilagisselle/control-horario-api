@@ -66,17 +66,17 @@ public class UsuarioController {
                 .orElseThrow(() ->
                         new RuntimeException("Usuario no encontrado con correo: " + correo));
 
-      if (request.getNombre() != null) {
-    usuario.setNombre(request.getNombre());
-}
+            if (request.getNombre() != null) {
+            usuario.setNombre(request.getNombre());
+            }
 
-if (request.getEstado() != null) {
-    usuario.setEstado(request.getEstado());
-}
+            if (request.getEstado() != null) {
+            usuario.setEstado(request.getEstado());
+            }
 
         Usuario actualizado = usuarioRepository.save(usuario);
         return mapToResponse(actualizado);
-    }
+     }
 
     // Mapper Entidad → DTO
     private UsuarioResponse mapToResponse(Usuario usuario) {
