@@ -9,5 +9,4 @@ public class ControlHorarioApiApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(ControlHorarioApiApplication.class, args);
 	}
-
 }
