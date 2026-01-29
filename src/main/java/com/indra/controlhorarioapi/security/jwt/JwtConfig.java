@@ -23,7 +23,7 @@ public class JwtConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/v1/control-horario/login").permitAll()
+                        .requestMatchers("/usuario/login").permitAll()
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)

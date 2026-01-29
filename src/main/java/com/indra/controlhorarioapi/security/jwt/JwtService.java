@@ -1,22 +1,24 @@
 package com.indra.controlhorarioapi.security.jwt;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.indra.controlhorarioapi.model.Usuario;
 import io.jsonwebtoken.*;
 import org.springframework.stereotype.Service;
 
-import com.indra.controlhorarioapi.model.Usuario;
-
 import java.util.Date;
+import java.util.Map;
 
 @Service
 public class JwtService {
 
     private final String SECRET_KEY = "NzgwMTQwODMtZGE5ZC00NDk5LTk1YWItZDk0Njc4ZDJiMjM5";
 
-    public String generarToken(Usuario username) {
+    public String generarToken(Map<String, Object> userData) {
+
         return Jwts.builder()
-                .setSubject(username.toString())
+                .claim("usuario", userData)   // 👈 mete el objeto
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60)) // 1 hora
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
                 .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
                 .compact();
     }
@@ -29,13 +31,4 @@ public class JwtService {
             return false;
         }
     }
-
-    public String extraerUsername(String token) {
-        return Jwts.parser()
-                .setSigningKey(SECRET_KEY)
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
-    }
 }
-
