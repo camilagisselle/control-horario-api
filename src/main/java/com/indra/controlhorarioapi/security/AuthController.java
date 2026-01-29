@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/login")
 public class AuthController {
 
     private final JwtService jwtService;
@@ -20,7 +20,7 @@ public class AuthController {
         this.jwtService = jwtService;
     }
 
-    @PostMapping("/login")
+    @PostMapping
     public ResponseEntity<String> login(@RequestBody Usuario loginRequest) {
         Usuario usuario = usuarioRepository.findByCorreo(loginRequest.getCorreo()).orElse(null);
         if (usuario != null && usuario.getPassword().equals(loginRequest.getPassword())) {
