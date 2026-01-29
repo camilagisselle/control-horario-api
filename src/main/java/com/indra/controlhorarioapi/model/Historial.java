@@ -13,7 +13,6 @@ public class Historial {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonIgnore
     private long id;
 
     @Column

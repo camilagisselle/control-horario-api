@@ -3,13 +3,16 @@ package com.indra.controlhorarioapi.controller;
 import com.indra.controlhorarioapi.model.Historial;
 import com.indra.controlhorarioapi.repository.HistorialRepository;
 import com.indra.controlhorarioapi.repository.UsuarioRepository;
+
+import java.util.List;
+
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/historial")
+@RequestMapping("/v1/control-horario/historial")
 public class HistorialController {
 
     private final UsuarioRepository usuarioRepository;
@@ -18,6 +21,23 @@ public class HistorialController {
     public HistorialController(UsuarioRepository usuarioRepository, HistorialRepository historialRepository) {
         this.usuarioRepository = usuarioRepository;
         this.historialRepository = historialRepository;
+    }
+
+    @GetMapping
+    public List<Historial> getAllHistorial() {
+        return this.historialRepository.findAll();
+    }
+
+    @GetMapping("/{correo}")
+    public ResponseEntity<List<Historial>> obtenerHistorialPorCorreo(@PathVariable String correo) {
+
+        List<Historial> historial = historialRepository.findByUsuarioCorreo(correo);
+
+        if (historial.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(historial);
     }
 
     @PostMapping("/{correo}")
@@ -30,4 +50,32 @@ public class HistorialController {
 
         return new ResponseEntity<>(historial, HttpStatus.CREATED);
     }
+
+    
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Historial> actualizarMarcacion(
+        @PathVariable Long id,
+        @RequestBody Historial historialRequest) {
+
+        Historial historial = historialRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException(
+                    "Historial no encontrado con id = " + id));
+
+        if (historialRequest.getInicioColacion() != null) {
+            historial.setInicioColacion(historialRequest.getInicioColacion());
+        }
+
+        if (historialRequest.getFinColacion() != null) {
+            historial.setFinColacion(historialRequest.getFinColacion());
+        }
+
+        if (historialRequest.getSalida() != null) {
+            historial.setSalida(historialRequest.getSalida());
+        }
+
+        Historial actualizado = historialRepository.save(historial);
+        return ResponseEntity.ok(actualizado);
+    }
+
 }
