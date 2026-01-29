@@ -2,6 +2,7 @@ package com.indra.controlhorarioapi.controller;
 
 import com.indra.controlhorarioapi.dto.UsuarioRequest;
 import com.indra.controlhorarioapi.dto.UsuarioResponse;
+import com.indra.controlhorarioapi.model.Perfil;
 import com.indra.controlhorarioapi.model.Usuario;
 import com.indra.controlhorarioapi.repository.UsuarioRepository;
 import com.indra.controlhorarioapi.dto.UsuarioUpdateRequest;
@@ -13,7 +14,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/v1/control-horario/usuarios")
+@RequestMapping("/v1/control-horario/usuario")
 public class UsuarioController {
 
     private final UsuarioRepository usuarioRepository;
@@ -51,6 +52,14 @@ public class UsuarioController {
         usuario.setCorreo(request.getCorreo());
         usuario.setPassword(request.getPassword());
         usuario.setEstado(request.getEstado());
+
+        //TODO: rescatar el perfil con el id informado
+        Perfil perfil = new Perfil();
+        perfil.setPerfil_id(1);
+        perfil.setPerfil_nombre("Administrador");
+
+        usuario.setPerfil(perfil);
+
 
         Usuario guardado = usuarioRepository.save(usuario);
         return mapToResponse(guardado);
