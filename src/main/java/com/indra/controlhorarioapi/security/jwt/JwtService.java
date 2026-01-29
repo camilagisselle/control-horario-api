@@ -3,6 +3,8 @@ package com.indra.controlhorarioapi.security.jwt;
 import io.jsonwebtoken.*;
 import org.springframework.stereotype.Service;
 
+import com.indra.controlhorarioapi.model.Usuario;
+
 import java.util.Date;
 
 @Service
@@ -10,9 +12,9 @@ public class JwtService {
 
     private final String SECRET_KEY = "NzgwMTQwODMtZGE5ZC00NDk5LTk1YWItZDk0Njc4ZDJiMjM5";
 
-    public String generarToken(String username) {
+    public String generarToken(Usuario username) {
         return Jwts.builder()
-                .setSubject(username)
+                .setSubject(username.toString())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60)) // 1 hora
                 .signWith(SignatureAlgorithm.HS256, SECRET_KEY)

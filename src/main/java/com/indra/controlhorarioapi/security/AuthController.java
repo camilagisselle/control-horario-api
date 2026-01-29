@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/login")
+@RequestMapping("/v1/control-horario/login")
 public class AuthController {
 
     private final JwtService jwtService;
@@ -24,7 +24,7 @@ public class AuthController {
     public ResponseEntity<String> login(@RequestBody Usuario loginRequest) {
         Usuario usuario = usuarioRepository.findByCorreo(loginRequest.getCorreo()).orElse(null);
         if (usuario != null && usuario.getPassword().equals(loginRequest.getPassword())) {
-            return ResponseEntity.ok(jwtService.generarToken(usuario.getCorreo()));
+            return ResponseEntity.ok(jwtService.generarToken(usuario));
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales incorrectas");
     }
