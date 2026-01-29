@@ -7,10 +7,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/login")
+@RequestMapping("/v1/control-horario/login")
 public class AuthController {
 
     private final JwtService jwtService;
@@ -26,11 +27,25 @@ public class AuthController {
     public ResponseEntity<?> login(@RequestBody Usuario loginRequest) {
         Usuario usuario = usuarioRepository.findByCorreo(loginRequest.getCorreo()).orElse(null);
         if (usuario != null && usuario.getPassword().equals(loginRequest.getPassword())) {
-            String token = jwtService.generarToken((Map<String, Object>) usuario);
+            Map<String, Object> userData = new HashMap<>();
+            userData.put("correo", usuario.getCorreo());
+            userData.put("nombre", usuario.getNombre());
+            userData.put("estado", usuario.getEstado());
+            //userData.put("estado", usuario.getPerfil());
+
+            String token = jwtService.generarToken(userData);
+            /*
             return ResponseEntity.ok(
                     java.util.Map.of("token", token)
             );
+            */
+            Map<String, String> response = new HashMap<>();
+            response.put("token", token);
+
+            return ResponseEntity.ok(response);
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("Usuario o clave inválidos");
         }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales incorrectas");
     }
 }

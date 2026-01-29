@@ -1,7 +1,5 @@
 package com.indra.controlhorarioapi.security.jwt;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.indra.controlhorarioapi.model.Usuario;
 import io.jsonwebtoken.*;
 import org.springframework.stereotype.Service;
 
