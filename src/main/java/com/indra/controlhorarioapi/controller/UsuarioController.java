@@ -8,6 +8,7 @@ import com.indra.controlhorarioapi.repository.UsuarioRepository;
 import com.indra.controlhorarioapi.dto.UsuarioUpdateRequest;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -43,6 +44,7 @@ public class UsuarioController {
     }
 
     // POST /usuarios
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public UsuarioResponse crearUsuario(@RequestBody UsuarioRequest request) {
