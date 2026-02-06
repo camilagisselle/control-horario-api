@@ -24,4 +24,4 @@ public class PerfilController {
         return this.perfilRepository.findAll();
     }
 
-} 
+}

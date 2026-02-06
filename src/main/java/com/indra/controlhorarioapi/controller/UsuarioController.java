@@ -4,6 +4,7 @@ import com.indra.controlhorarioapi.dto.UsuarioRequest;
 import com.indra.controlhorarioapi.dto.UsuarioResponse;
 import com.indra.controlhorarioapi.model.Perfil;
 import com.indra.controlhorarioapi.model.Usuario;
+import com.indra.controlhorarioapi.repository.PerfilRepository;
 import com.indra.controlhorarioapi.repository.UsuarioRepository;
 import com.indra.controlhorarioapi.dto.UsuarioUpdateRequest;
 
@@ -14,14 +15,15 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+
 @RestController
 @RequestMapping("/v1/control-horario/usuario")
 public class UsuarioController {
-
     private final UsuarioRepository usuarioRepository;
-
-    public UsuarioController(UsuarioRepository usuarioRepository) {
+    private final PerfilRepository perfilRepository;
+    public UsuarioController(UsuarioRepository usuarioRepository, PerfilRepository perfilRepository) {
         this.usuarioRepository = usuarioRepository;
+        this.perfilRepository = perfilRepository;
     }
 
     // GET /usuarios
@@ -43,6 +45,12 @@ public class UsuarioController {
         return mapToResponse(usuario);
     }
 
+    // GET /perfil
+    @GetMapping("/perfiles")
+    public List<Perfil> getAllPerfiles() {
+        return perfilRepository.findAll();
+    }
+
     // POST /usuarios
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @PostMapping
@@ -55,13 +63,10 @@ public class UsuarioController {
         usuario.setPassword(request.getPassword());
         usuario.setEstado(request.getEstado());
 
-        //TODO: rescatar el perfil con el id informado
-        Perfil perfil = new Perfil();
-        perfil.setPerfil_id(1);
-        perfil.setPerfil_nombre("Administrador");
+        Perfil perfil = perfilRepository.findById(request.getPerfilId().longValue()).orElseThrow(() ->
+                new RuntimeException("Perfil no existe"));
 
         usuario.setPerfil(perfil);
-
 
         Usuario guardado = usuarioRepository.save(usuario);
         return mapToResponse(guardado);
