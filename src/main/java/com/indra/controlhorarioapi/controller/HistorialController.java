@@ -1,10 +1,13 @@
 package com.indra.controlhorarioapi.controller;
 
+import com.indra.controlhorarioapi.dto.HistorialRequest;
 import com.indra.controlhorarioapi.dto.HistorialResponse;
 import com.indra.controlhorarioapi.model.Historial;
+import com.indra.controlhorarioapi.model.Usuario;
 import com.indra.controlhorarioapi.repository.HistorialRepository;
 import com.indra.controlhorarioapi.repository.UsuarioRepository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
@@ -19,17 +22,30 @@ public class HistorialController {
     private final UsuarioRepository usuarioRepository;
     private final HistorialRepository historialRepository;
 
-    public HistorialController(UsuarioRepository usuarioRepository, HistorialRepository historialRepository) {
+    public HistorialController(UsuarioRepository usuarioRepository,
+                               HistorialRepository historialRepository) {
         this.usuarioRepository = usuarioRepository;
         this.historialRepository = historialRepository;
     }
 
     @GetMapping
-    public List<Historial> getAllHistorial() {
-        return this.historialRepository.findAll();
+    public List<HistorialResponse> getAllHistorial() {
+
+        return historialRepository.findAll()
+                .stream()
+                .map(h -> new HistorialResponse(
+                        h.getId(),
+                        h.getFecha(),
+                        h.getEntrada(),
+                        h.getInicioColacion(),
+                        h.getFinColacion(),
+                        h.getSalida(),
+                        h.getUsuario().getCorreo()
+                ))
+                .toList();
     }
 
-    @GetMapping("/{correo}")
+    @GetMapping("/usuario/{correo}")
     public ResponseEntity<List<HistorialResponse>> obtenerHistorialPorCorreo(
             @PathVariable String correo) {
 
@@ -37,13 +53,14 @@ public class HistorialController {
                 .findByUsuarioCorreo(correo)
                 .stream()
                 .map(h -> new HistorialResponse(
+                        h.getId(),
                         h.getFecha(),
                         h.getEntrada(),
+                        h.getInicioColacion(),
+                        h.getFinColacion(),
                         h.getSalida(),
                         h.getUsuario().getCorreo()
-                )
-
-                )
+                ))
                 .toList();
 
         return historial.isEmpty()
@@ -52,24 +69,53 @@ public class HistorialController {
     }
 
     @PostMapping("/{correo}")
-    public ResponseEntity<Historial> createHistorial(@PathVariable(value = "correo") String correo, @RequestBody Historial historialRequest) {
+    public ResponseEntity<Historial> registrarAccion(
+            @PathVariable String correo,
+            @RequestBody HistorialRequest request) {
 
-        Historial historial = usuarioRepository.findByCorreo(correo).map(usuario -> {
-            historialRequest.setUsuario(usuario);
-            return historialRepository.save(historialRequest);
-        }).orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado, con correo = " + correo));
+        LocalDate fecha = request.getFecha();
 
-        return new ResponseEntity<>(historial, HttpStatus.CREATED);
+        Historial historial = historialRepository
+                .findByUsuarioCorreoAndFecha(correo, fecha)
+                .orElseGet(() -> {
+                    Historial nuevo = new Historial();
+                    nuevo.setFecha(fecha);
+
+                    Usuario usuario = usuarioRepository.findByCorreo(correo)
+                            .orElseThrow(() ->
+                                    new ResourceNotFoundException("Usuario no encontrado"));
+
+                    nuevo.setUsuario(usuario);
+                    return nuevo;
+                });
+
+        if (request.getEntrada() != null)
+            historial.setEntrada(request.getEntrada());
+
+        if (request.getInicioColacion() != null)
+            historial.setInicioColacion(request.getInicioColacion());
+
+        if (request.getFinColacion() != null)
+            historial.setFinColacion(request.getFinColacion());
+
+        if (request.getSalida() != null)
+            historial.setSalida(request.getSalida());
+
+        Historial guardado = historialRepository.save(historial);
+
+        return ResponseEntity.ok(guardado);
     }
+
 
     @PutMapping("/{id}")
     public ResponseEntity<Historial> actualizarMarcacion(
-        @PathVariable Long id,
-        @RequestBody Historial historialRequest) {
+            @PathVariable Long id,
+            @RequestBody HistorialRequest historialRequest) {
 
         Historial historial = historialRepository.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException(
-                    "Historial no encontrado con id = " + id));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Historial no encontrado con id = " + id));
 
         if (historialRequest.getInicioColacion() != null) {
             historial.setInicioColacion(historialRequest.getInicioColacion());
@@ -84,6 +130,7 @@ public class HistorialController {
         }
 
         Historial actualizado = historialRepository.save(historial);
+
         return ResponseEntity.ok(actualizado);
     }
 }
