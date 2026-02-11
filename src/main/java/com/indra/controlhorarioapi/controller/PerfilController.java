@@ -23,5 +23,4 @@ public class PerfilController {
     public List<Perfil> getAllPerfiles() {
         return this.perfilRepository.findAll();
     }
-
 }

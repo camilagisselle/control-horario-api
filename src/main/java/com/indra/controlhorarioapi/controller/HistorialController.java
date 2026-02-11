@@ -1,5 +1,6 @@
 package com.indra.controlhorarioapi.controller;
 
+import com.indra.controlhorarioapi.dto.HistorialResponse;
 import com.indra.controlhorarioapi.model.Historial;
 import com.indra.controlhorarioapi.repository.HistorialRepository;
 import com.indra.controlhorarioapi.repository.UsuarioRepository;
@@ -29,15 +30,25 @@ public class HistorialController {
     }
 
     @GetMapping("/{correo}")
-    public ResponseEntity<List<Historial>> obtenerHistorialPorCorreo(@PathVariable String correo) {
+    public ResponseEntity<List<HistorialResponse>> obtenerHistorialPorCorreo(
+            @PathVariable String correo) {
 
-        List<Historial> historial = historialRepository.findByUsuarioCorreo(correo);
+        List<HistorialResponse> historial = historialRepository
+                .findByUsuarioCorreo(correo)
+                .stream()
+                .map(h -> new HistorialResponse(
+                        h.getFecha(),
+                        h.getEntrada(),
+                        h.getSalida(),
+                        h.getUsuario().getCorreo()
+                )
 
-        if (historial.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
+                )
+                .toList();
 
-        return ResponseEntity.ok(historial);
+        return historial.isEmpty()
+                ? ResponseEntity.noContent().build()
+                : ResponseEntity.ok(historial);
     }
 
     @PostMapping("/{correo}")
@@ -50,8 +61,6 @@ public class HistorialController {
 
         return new ResponseEntity<>(historial, HttpStatus.CREATED);
     }
-
-    
 
     @PutMapping("/{id}")
     public ResponseEntity<Historial> actualizarMarcacion(
@@ -77,5 +86,4 @@ public class HistorialController {
         Historial actualizado = historialRepository.save(historial);
         return ResponseEntity.ok(actualizado);
     }
-
 }
