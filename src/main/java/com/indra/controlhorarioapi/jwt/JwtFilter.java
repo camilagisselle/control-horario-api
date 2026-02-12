@@ -1,5 +1,5 @@
 package com.indra.controlhorarioapi.jwt;
-
+import org.springframework.security.core.userdetails.User;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,9 +25,13 @@ public class JwtFilter extends OncePerRequestFilter {
             if (JwtUtil.validateToken(token)) {
                 String username = JwtUtil.getUsernameFromToken(token);
                 String role = JwtUtil.getRoleFromToken(token);
-                SimpleGrantedAuthority authority = new SimpleGrantedAuthority(role);
-                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                        username, null, Collections.singletonList(authority));
+
+                User userDetails = new User(username, "",
+                        Collections.singletonList(new SimpleGrantedAuthority(role)));
+
+                UsernamePasswordAuthenticationToken auth =
+                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+
                 SecurityContextHolder.getContext().setAuthentication(auth);
             }
         }
