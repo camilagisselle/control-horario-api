@@ -2,6 +2,7 @@ package com.indra.controlhorarioapi.controller;
 
 import com.indra.controlhorarioapi.dto.UsuarioRequest;
 import com.indra.controlhorarioapi.dto.UsuarioResponse;
+import com.indra.controlhorarioapi.dto.PassRequest;
 import com.indra.controlhorarioapi.model.Perfil;
 import com.indra.controlhorarioapi.model.Usuario;
 import com.indra.controlhorarioapi.repository.PerfilRepository;
@@ -10,20 +11,24 @@ import com.indra.controlhorarioapi.dto.UsuarioUpdateRequest;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
 
 @RestController
 @RequestMapping("/v1/control-horario/usuario")
 public class UsuarioController {
     private final UsuarioRepository usuarioRepository;
     private final PerfilRepository perfilRepository;
-    public UsuarioController(UsuarioRepository usuarioRepository, PerfilRepository perfilRepository) {
+    private final PasswordEncoder passwordEncoder;
+    public UsuarioController(UsuarioRepository usuarioRepository, PerfilRepository perfilRepository, PasswordEncoder passwordEncoder) {
         this.usuarioRepository = usuarioRepository;
         this.perfilRepository = perfilRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     // GET /usuarios
@@ -93,6 +98,24 @@ public class UsuarioController {
         Usuario actualizado = usuarioRepository.save(usuario);
         return mapToResponse(actualizado);
      }
+
+    @PutMapping("/password")
+    public void cambiarPassword(@AuthenticationPrincipal UserDetails userDetails,
+                                @RequestBody PassRequest request) {
+
+        if (userDetails == null) {
+            throw new RuntimeException("Usuario no autenticado");
+        }
+
+        String correo = userDetails.getUsername();
+
+        Usuario usuario = usuarioRepository.findById(correo)
+                .orElseThrow(() ->
+                        new RuntimeException("Usuario no encontrado"));
+
+        usuario.setPassword(request.getPasswordNueva());
+        usuarioRepository.save(usuario);
+    }
 
     // Mapper Entidad → DTO
     private UsuarioResponse mapToResponse(Usuario usuario) {

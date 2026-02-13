@@ -11,7 +11,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -86,6 +85,12 @@ public class HistorialController {
                                     new ResourceNotFoundException("Usuario no encontrado"));
 
                     nuevo.setUsuario(usuario);
+
+                    nuevo.setEntrada(null);
+                    nuevo.setSalida(null);
+                    nuevo.setInicioColacion(null);
+                    nuevo.setFinColacion(null);
+
                     return nuevo;
                 });
 
@@ -105,7 +110,6 @@ public class HistorialController {
 
         return ResponseEntity.ok(guardado);
     }
-
 
     @PutMapping("/{id}")
     public ResponseEntity<Historial> actualizarMarcacion(
