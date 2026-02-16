@@ -7,6 +7,7 @@ import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -25,6 +26,12 @@ public class Usuario {
 
     @Column
     private Integer estado;
+
+    @Column
+    private String codigoRecuperacion;
+
+    @Column
+    private LocalDateTime codigoExpiracion;
 
     @OneToMany(mappedBy="usuario")
     private List<Historial> historial;
