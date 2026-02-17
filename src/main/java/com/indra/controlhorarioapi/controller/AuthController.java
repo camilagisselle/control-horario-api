@@ -21,7 +21,6 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Usuario loginRequest) {
-
         Usuario usuario = usuarioRepository.findByCorreo(loginRequest.getCorreo()).orElse(null);
         if (usuario != null && usuario.getPassword().equals(loginRequest.getPassword())) {
             Map<String, Object> userData = new HashMap<>();
@@ -29,7 +28,10 @@ public class AuthController {
             userData.put("nombre", usuario.getNombre());
             userData.put("estado", usuario.getEstado());
 
-            String role = "admin".equals(loginRequest.getCorreo()) ? "ROLE_ADMIN" : "ROLE_USER";
+            String role = "ROLE_USER";
+            if (usuario.getPerfil() != null && "Administrador".equals(usuario.getPerfil().getPerfil_nombre())) {
+                role = "ROLE_ADMIN";
+            }
 
             String token = JwtUtil.generateToken(usuario.getCorreo(), role, userData);
 
@@ -37,9 +39,7 @@ public class AuthController {
             response.put("token", token);
 
             return ResponseEntity.ok().body(response);
-
         }
         return ResponseEntity.status(401).body("Invalid credentials");
     }
-
 }

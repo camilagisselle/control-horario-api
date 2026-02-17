@@ -46,7 +46,7 @@ public class UsuarioRequest {
         this.estado = estado;
     }
 
-    public Integer geItPerfilId() {
+    public Integer getPerfilId() {
         return perfilId;
     }
 

@@ -7,33 +7,30 @@ import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+
 @Entity
 @Getter @Setter
 public class Historial {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
-    @Column
-    private String fecha;
+    private LocalDate fecha;
 
-    @Column
-    private String entrada;
+    private LocalTime entrada;
 
-    @Column
-    private String inicioColacion;
+    private LocalTime inicioColacion;
 
-    @Column
-    private String finColacion;
+    private LocalTime finColacion;
 
-    @Column
-    private String salida;
+    private LocalTime salida;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "correo", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
     private Usuario usuario;
-
 }
