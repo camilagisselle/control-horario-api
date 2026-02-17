@@ -11,24 +11,35 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
-@Bean
-public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    return http
-            .cors(cors -> {})
-            .csrf(AbstractHttpConfigurer::disable)
-            .sessionManagement(sess ->
-                    sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            )
-            .authorizeHttpRequests(auth -> auth
-                    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                    .requestMatchers("/v1/control-horario/login").permitAll()
-                    .anyRequest().authenticated()
-            )
-            .addFilterBefore(new JwtFilter(), UsernamePasswordAuthenticationFilter.class)
-            .build();
-    }   
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        return http
+                .cors(cors -> {})
+                .csrf(AbstractHttpConfigurer::disable)
+                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers("/v1/control-horario/login").permitAll()
+                        // TODO: mientras trabajamos con password plana, permitir todo
+                        .anyRequest().permitAll()
+                )
+                // Sacamos el filtro JWT mientras desarrollamos con password plana
+                //.addFilterBefore(new JwtFilter(), UsernamePasswordAuthenticationFilter.class)
+                .build();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        // Opcionalmente, usar NoOpPasswordEncoder para password plana
+        return org.springframework.security.crypto.password.NoOpPasswordEncoder.getInstance();
+        // return new BCryptPasswordEncoder(); <-- esto hashaba todo
+    }
 }
