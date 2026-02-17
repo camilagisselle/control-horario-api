@@ -95,6 +95,12 @@ public class UsuarioController {
             usuario.setEstado(request.getEstado());
             }
 
+            if (request.getPerfilId() != null) {
+                Perfil perfil = perfilRepository.findById(request.getPerfilId().longValue())
+                        .orElseThrow(() -> new RuntimeException("Perfil no existe"));
+                usuario.setPerfil(perfil);
+            }
+
         Usuario actualizado = usuarioRepository.save(usuario);
         return mapToResponse(actualizado);
      }
