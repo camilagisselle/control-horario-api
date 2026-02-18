@@ -18,7 +18,6 @@ public class PassResetController {
     @PostMapping("/request")
     public void requestReset(@RequestBody PassResetRequest request) {
 
-        String token = service.crearToken(request.getCorreo());
         service.crearToken(request.getCorreo());
     }
 
