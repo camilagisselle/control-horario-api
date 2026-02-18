@@ -19,9 +19,7 @@ public class PassResetController {
     public void requestReset(@RequestBody PassResetRequest request) {
 
         String token = service.crearToken(request.getCorreo());
-
-        // después enviamos mail
-        System.out.println("TOKEN: " + token);
+        service.crearToken(request.getCorreo());
     }
 
     @PostMapping("/change")

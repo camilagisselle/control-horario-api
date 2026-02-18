@@ -1,5 +1,6 @@
 package com.indra.controlhorarioapi.service;
 
+import com.indra.controlhorarioapi.model.EmailDetails;
 import com.indra.controlhorarioapi.model.PassResetToken;
 import com.indra.controlhorarioapi.model.Usuario;
 import com.indra.controlhorarioapi.repository.PassResetTokenRepository;
@@ -13,11 +14,13 @@ import java.util.UUID;
 public class PassResetService {
     private final PassResetTokenRepository tokenRepository;
     private final UsuarioRepository usuarioRepository;
+    private final EmailService emailService;
 
     public PassResetService(PassResetTokenRepository tokenRepository,
-                                UsuarioRepository usuarioRepository) {
+                            UsuarioRepository usuarioRepository, EmailService emailService) {
         this.tokenRepository = tokenRepository;
         this.usuarioRepository = usuarioRepository;
+        this.emailService = emailService;
     }
 
     public String crearToken(String correo) {
@@ -34,6 +37,19 @@ public class PassResetService {
         entity.setExpiracion(LocalDateTime.now().plusHours(1));
 
         tokenRepository.save(entity);
+
+        String link = "http://localhost:5173/recupcontrasena?correo="+correo+"&token="+token;
+        String mensaje = "Estimado " + usuario.getNombre() + ",\n\n" +
+                "Haga clic en el siguiente enlace para restablecer su contraseña:\n" +
+                link + "\n\n" +
+                "Saludos";
+
+        EmailDetails emailDetails = new EmailDetails();
+        emailDetails.setRecipient(correo);
+        emailDetails.setSubject("Restablece tu contraseña");
+        emailDetails.setMsgBody(mensaje);
+
+        emailService.sendSimpleMail(emailDetails);
 
         return token;
     }
