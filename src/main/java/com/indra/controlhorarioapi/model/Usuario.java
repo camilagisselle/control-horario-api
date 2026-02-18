@@ -27,12 +27,6 @@ public class Usuario {
     @Column
     private Integer estado;
 
-    @Column
-    private String codigoRecuperacion;
-
-    @Column
-    private LocalDateTime codigoExpiracion;
-
     @OneToMany(mappedBy="usuario")
     private List<Historial> historial;
 
@@ -41,5 +35,4 @@ public class Usuario {
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
     private Perfil perfil;
-
 }
