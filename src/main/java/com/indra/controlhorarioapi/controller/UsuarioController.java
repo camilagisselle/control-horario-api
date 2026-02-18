@@ -2,7 +2,7 @@ package com.indra.controlhorarioapi.controller;
 
 import com.indra.controlhorarioapi.dto.UsuarioRequest;
 import com.indra.controlhorarioapi.dto.UsuarioResponse;
-import com.indra.controlhorarioapi.dto.PassRequest;
+import com.indra.controlhorarioapi.dto.PassChangeRequest;
 import com.indra.controlhorarioapi.model.Perfil;
 import com.indra.controlhorarioapi.model.Usuario;
 import com.indra.controlhorarioapi.repository.PerfilRepository;
@@ -107,7 +107,7 @@ public class UsuarioController {
 
     @PutMapping("/password")
     public void cambiarPassword(@AuthenticationPrincipal UserDetails userDetails,
-                                @RequestBody PassRequest request) {
+                                @RequestBody PassChangeRequest request) {
 
         if (userDetails == null) {
             throw new RuntimeException("Usuario no autenticado");
@@ -119,7 +119,7 @@ public class UsuarioController {
                 .orElseThrow(() ->
                         new RuntimeException("Usuario no encontrado"));
 
-        usuario.setPassword(request.getPasswordNueva());
+        usuario.setPassword(request.getNuevaPassword());
         usuarioRepository.save(usuario);
     }
 
