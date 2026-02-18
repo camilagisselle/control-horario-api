@@ -1,8 +1,11 @@
 package com.indra.controlhorarioapi.controller;
 
+import com.indra.controlhorarioapi.model.EmailDetails;
 import com.indra.controlhorarioapi.model.Usuario;
 import com.indra.controlhorarioapi.repository.UsuarioRepository;
 import com.indra.controlhorarioapi.jwt.JwtUtil;
+import com.indra.controlhorarioapi.service.EmailService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,6 +21,18 @@ public class AuthController {
     public AuthController(UsuarioRepository usuarioRepository) {
         this.usuarioRepository = usuarioRepository;
     }
+
+
+    @Autowired
+    private EmailService emailService;
+
+    @PostMapping("/sendMail")
+    public String sendMail(@RequestBody EmailDetails details)
+    {
+        String status = emailService.sendSimpleMail(details);
+        return status;
+    }
+
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Usuario loginRequest) {
