@@ -38,9 +38,11 @@ public class PassResetService {
 
         tokenRepository.save(entity);
 
-        String link = "http://localhost:5173/recupcontrasena?correo="+correo+"&token="+token;
+        String link = "http://localhost:5173/recupcontrasena";
         String mensaje = "Estimado " + usuario.getNombre() + ",\n\n" +
-                "Haga clic en el siguiente enlace para restablecer su contraseña:\n" +
+                "Este es su código de verificación para restablecer su contraseña:\n" +
+                token + "\n" +
+                "favor ingresar al siguiente link para completar el proceso\n" +
                 link + "\n\n" +
                 "Saludos";
 
