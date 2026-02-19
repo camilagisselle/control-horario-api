@@ -6,6 +6,8 @@ import com.indra.controlhorarioapi.model.Historial;
 import com.indra.controlhorarioapi.model.Usuario;
 import com.indra.controlhorarioapi.repository.HistorialRepository;
 import com.indra.controlhorarioapi.repository.UsuarioRepository;
+import com.indra.controlhorarioapi.repository.DispositivoRepository;
+
 
 import java.time.LocalDate;
 import java.util.List;
@@ -20,12 +22,16 @@ public class HistorialController {
 
     private final UsuarioRepository usuarioRepository;
     private final HistorialRepository historialRepository;
+    private final DispositivoRepository dispositivoRepository;
 
     public HistorialController(UsuarioRepository usuarioRepository,
-                               HistorialRepository historialRepository) {
+                               HistorialRepository historialRepository,
+                               DispositivoRepository dispositivoRepository) {
         this.usuarioRepository = usuarioRepository;
         this.historialRepository = historialRepository;
-    }
+        this.dispositivoRepository = dispositivoRepository;
+    }   
+
 
     @GetMapping
     public List<HistorialResponse> getAllHistorial() {
@@ -68,9 +74,19 @@ public class HistorialController {
     }
 
     @PostMapping("/{correo}")
-    public ResponseEntity<Historial> registrarAccion(
+    public ResponseEntity<?> registrarAccion(
+            @RequestHeader("UUID") String uuid,
             @PathVariable String correo,
             @RequestBody HistorialRequest request) {
+        boolean dispositivoValido = dispositivoRepository
+                .findByUuidAndActivoTrue(uuid)
+                .isPresent();
+
+        if (!dispositivoValido) {
+            return ResponseEntity
+                    .status(403)
+                    .body("Dispositivo no autorizado");
+        }
 
         LocalDate fecha = request.getFecha();
 
