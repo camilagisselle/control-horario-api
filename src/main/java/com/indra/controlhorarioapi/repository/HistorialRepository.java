@@ -13,5 +13,6 @@ import org.springframework.stereotype.Repository;
 public interface HistorialRepository extends JpaRepository<Historial, Long> {
 
     List<Historial> findByUsuarioCorreo(String correo);
+    List<Historial> findAllByFechaBetween(LocalDate fechaStart, LocalDate fechaEnd);
     Optional<Historial> findByUsuarioCorreoAndFecha(String correo, LocalDate fecha);
 }
