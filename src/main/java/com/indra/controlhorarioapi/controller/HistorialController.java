@@ -13,8 +13,10 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/v1/control-horario/historial")
@@ -50,6 +52,29 @@ public class HistorialController {
                 .toList();
     }
 
+    @GetMapping("/fecha/{fechastart}/{fechaend}")
+    public ResponseEntity<List<HistorialResponse>> getAllHistorialByFechaBetween(
+            @PathVariable LocalDate fechastart, @PathVariable LocalDate fechaend) {
+
+        List<HistorialResponse> historial = historialRepository
+                .findAllByFechaBetween(fechastart,  fechaend)
+                .stream()
+                .map(h -> new HistorialResponse(
+                        h.getId(),
+                        h.getFecha(),
+                        h.getEntrada(),
+                        h.getInicioColacion(),
+                        h.getFinColacion(),
+                        h.getSalida(),
+                        h.getUsuario().getCorreo()
+                ))
+                .toList();
+
+        return historial.isEmpty()
+                ? ResponseEntity.noContent().build()
+                : ResponseEntity.ok(historial);
+    }
+
     @GetMapping("/usuario/{correo}")
     public ResponseEntity<List<HistorialResponse>> obtenerHistorialPorCorreo(
             @PathVariable String correo) {
@@ -78,6 +103,11 @@ public class HistorialController {
             @RequestHeader("UUID") String uuid,
             @PathVariable String correo,
             @RequestBody HistorialRequest request) {
+
+        if (uuid == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Missing UUID Header");
+        }
+
         boolean dispositivoValido = dispositivoRepository
                 .findByUuidAndActivoTrue(uuid)
                 .isPresent();

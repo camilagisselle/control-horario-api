@@ -36,7 +36,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Usuario loginRequest) {
-        Usuario usuario = usuarioRepository.findByCorreo(loginRequest.getCorreo()).orElse(null);
+        Usuario usuario = usuarioRepository.findByCorreoAndEstado(loginRequest.getCorreo(), 1).orElse(null);
         if (usuario != null && usuario.getPassword().equals(loginRequest.getPassword())) {
             Map<String, Object> userData = new HashMap<>();
             userData.put("correo", usuario.getCorreo());
